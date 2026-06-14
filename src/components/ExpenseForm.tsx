@@ -1,9 +1,26 @@
-import { CATEGORIES } from '../constants'
+import { CATEGORIES } from "../constants";
+import type { Expense } from "../types/expense";
 
-function ExpenseForm() {
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+interface ExpenseFormProps {
+  onAddExpense: (expense: Expense) => void;
+}
+function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     // TODO: create a new expense and add it to the list
+    const formData = new FormData(e.currentTarget);
+    const description = formData.get("description") as string;
+    const amount = Number(formData.get("amount"));
+    const category = formData.get("category") as string;
+    const newExpense: Expense = {
+      id: crypto.randomUUID(),
+      description,
+      amount,
+      category,
+      date: new Date().toLocaleDateString(),
+    };
+    onAddExpense(newExpense);
+    e.currentTarget.reset();
   }
 
   return (
@@ -11,11 +28,7 @@ function ExpenseForm() {
       <h2>Add Expense</h2>
       <label>
         Name
-        <input
-          name="description"
-          placeholder="e.g. Lunch"
-          required
-        />
+        <input name="description" placeholder="e.g. Lunch" required />
       </label>
       <label>
         Amount ($)
@@ -32,14 +45,16 @@ function ExpenseForm() {
         Category
         <select name="category" required>
           <option value="">Select category</option>
-          {CATEGORIES.map(c => (
-            <option key={c} value={c}>{c}</option>
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
       </label>
       <button type="submit">Add Expense</button>
     </form>
-  )
+  );
 }
 
-export default ExpenseForm
+export default ExpenseForm;
